@@ -4,9 +4,9 @@ use std::time::{SystemTime};
 
 use rppal::gpio::Gpio;
 
-fn pulse_in(pin:rppal::gpio::InputPin, time_out:u64) -> f64 {
+fn pulse_in(pin:rppal::gpio::InputPin, time_out:f64) -> f64 {
     let t0 = SystemTime::now();
-    let dur = Duration::from_secs(time_out);
+    let dur = Duration::from_secs(time_out as u64 * 0.000001 as u64);
 
     while pin.is_low() {
         if t0.elapsed().unwrap() > dur {
@@ -51,5 +51,5 @@ fn main() {
     thread::sleep(Duration::from_micros(10));
     pin22.set_low();
 
-    println!("{}", pulse_in(pin17, 10));
+    println!("{}", pulse_in(pin17, 10.0));
 }
