@@ -4,26 +4,30 @@ use std::time::{SystemTime};
 
 use rppal::gpio::Gpio;
 
-fn pulse_in(pin:rppal::gpio::InputPin, time_out:f64) -> f64 {
-    let t0 = SystemTime::now();
-    let dur = Duration::from_secs(time_out as u64 * 0.000001 as u64);
+fn time() -> u128 {
+    return SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis();
+}
 
+fn pulse_in(pin:rppal::gpio::InputPin) -> u128 {
+    //13200
+    let dur = Duration::from_millis(13200);
+    // let dur = Duration::from_secs(time_out);
+
+    let t0 = time();
     while pin.is_low() {
-        if t0.elapsed().unwrap() > dur {
-            return 0.0;
+        if (time() - t0) > dur.as_millis() * 0.000001 as u128 {
+            return 0;
         }
     }
 
-    let t0 = SystemTime::now();
+    let t0 = time();
     while pin.is_high() {
-        if t0.elapsed().unwrap() > dur {
-            return 0.0;
+        if (time() - t0) > dur.as_millis() * 0.000001 as u128 {
+            return 0;
         }
     }
 
-    // println!("{}", "y");
-    // println!("{}", pin.read());
-    return t0.elapsed().unwrap().as_millis() as f64*1000000.0;
+    return (time()-t0)*1000000
 }
 
 // def pulseIn(pin,level,timeOut): # function pulseIn: obtain pulse time of a pin
@@ -51,5 +55,5 @@ fn main() {
     thread::sleep(Duration::from_micros(10));
     pin22.set_low();
 
-    println!("{}", pulse_in(pin17, 10.0));
+    println!("{}", pulse_in(pin17));
 }
